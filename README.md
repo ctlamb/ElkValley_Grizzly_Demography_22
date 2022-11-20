@@ -1,22 +1,11 @@
----
-title: "Elk Valley Grizzly Demography 2016-2022"
-author: "Clayton T. Lamb"
-date: '`r format(Sys.time(), "%d %B, %Y")`'
-output: github_document
----
-
-
-```{r render, eval=FALSE,include=FALSE}
-rmarkdown::render(here::here('EV_demography.Rmd'),
-                  output_file =  "README.md")
-# 
-# knitr::purl(input=here::here('CaribouIPM_BCAB.Rmd'),
-#                   output =  here::here("scripts_r", '3.results_summary.r'))
-```
-
+Elk Valley Grizzly Demography 2016-2022
+================
+Clayton T. Lamb
+20 November, 2022
 
 ## Load Data
-```{r Load packages and data, results='hide', message=FALSE, warning=FALSE}
+
+``` r
 library(here)
 library(survival)
 library(hrbrthemes)
@@ -94,10 +83,9 @@ range <- st_read(here::here("data/range/Current_LambEdits_poly.shp"))%>%
   st_intersection(st_make_valid(pnw))
 ```
 
- 
 ## Delineate study area
-```{r Delineate study area, fig.height=9, fig.width=7.5, message=FALSE, warning=FALSE}
 
+``` r
 ##calculate UD for each individual 
 
 telem.amt <-  telem%>%
@@ -133,8 +121,14 @@ hr.center <- hr%>%st_centroid()
 
 ##export hr centers for designating DNA area
 st_write(hr.center, here::here("data","studyarea","hr_centers.shp"), delete_dsn = TRUE)
+```
 
+    ## Deleting source `/Users/claytonlamb/Dropbox/Documents/University/PDF/PDF Analyses/ElkValley_Grizzly_Demography_22/data/studyarea/hr_centers.shp' using driver `ESRI Shapefile'
+    ## Writing layer `hr_centers' to data source 
+    ##   `/Users/claytonlamb/Dropbox/Documents/University/PDF/PDF Analyses/ElkValley_Grizzly_Demography_22/data/studyarea/hr_centers.shp' using driver `ESRI Shapefile'
+    ## Writing 64 features with 2 fields and geometry type Point.
 
+``` r
 ##do again for all animals pooled
 sa <-  telem%>%
   filter(DateTime>ymd("2016-08-14"))%>%
@@ -148,7 +142,14 @@ sa <-  telem%>%
   hr_isopleths()
 
 st_write(sa, here::here("data","studyarea","EV_grizz_sa.shp"), delete_dsn = TRUE)
+```
 
+    ## Deleting source `/Users/claytonlamb/Dropbox/Documents/University/PDF/PDF Analyses/ElkValley_Grizzly_Demography_22/data/studyarea/EV_grizz_sa.shp' using driver `ESRI Shapefile'
+    ## Writing layer `EV_grizz_sa' to data source 
+    ##   `/Users/claytonlamb/Dropbox/Documents/University/PDF/PDF Analyses/ElkValley_Grizzly_Demography_22/data/studyarea/EV_grizz_sa.shp' using driver `ESRI Shapefile'
+    ## Writing 1 features with 3 fields and geometry type Multi Polygon.
+
+``` r
 ##map
 ggplot()+
   geom_sf(data=sa, fill=NA)+
@@ -156,13 +157,13 @@ ggplot()+
   geom_sf(data=hr.center)+
   theme_classic()+
   labs(title="Study Area Extents", subtitle="Larger area is primary study area defined by 99th percentile of telemetry\nShaded is interior 5 km buffer for DNA capture-recapture encompassing homerange centers")
-
 ```
 
-
+![](README_files/figure-gfm/Delineate%20study%20area-1.png)<!-- -->
 
 ## Capture data
-```{r Capture data, fig.height=9, fig.width=7.5, message=FALSE, warning=FALSE}
+
+``` r
 ## Clean up capture data
 cap <- cap.raw%>%
   filter(Species%in%"Grizzly Bear")%>%
@@ -230,8 +231,11 @@ set.seed(6789);ggplot(cap, aes(x=age.combine, y=Weight, color=Sex%>%fct_relevel(
         legend.title=element_text(size=15),
         legend.position = "bottom")->weight.plot
 weight.plot
+```
 
+![](README_files/figure-gfm/Capture%20data-1.png)<!-- -->
 
+``` r
 ##Fat
 fat.plot <- ggplot(cap%>%
          arrange(desc(CapReason))%>%
@@ -254,10 +258,12 @@ fat.plot <- ggplot(cap%>%
         legend.box="vertical", legend.margin=margin())+
   scale_x_date(labels = date_format("%b"), breaks = date_breaks("1 month"))
 fat.plot
-
 ```
-## Summarize capture data
-```{r Summarize capture data, fig.height=9, fig.width=7.5, message=FALSE, warning=FALSE}
+
+![](README_files/figure-gfm/Capture%20data-2.png)<!-- --> \## Summarize
+capture data
+
+``` r
 cap%>%
   summarise(captured_inds=n_distinct(BearID),
             total_caps=n(),
@@ -364,10 +370,21 @@ write_csv(cap.summary, here::here("tables/cap.summary.csv"))
 
 kable(cap.summary)
 ```
+
+| Sex | AgeClass        | Individuals | Captures | Management | Age       | Weight        | Fat        | Neck          | Chest         | Length        |
+|:----|:----------------|------------:|---------:|-----------:|:----------|:--------------|:-----------|:--------------|:--------------|:--------------|
+| F   | Dependent (0-1) |           4 |        4 |          2 | 0 (0-1)   | 34 (34-34)    | \-         | NaN (Inf–Inf) | NaN (Inf–Inf) | NaN (Inf–Inf) |
+| F   | Subadult (2-6)  |          18 |       23 |          4 | 4 (2-6)   | 95 (46-130)   | 24 (5-34)  | 54 (43-61)    | 93 (82-108)   | 142 (118-155) |
+| F   | Adult (\>6)     |          20 |       30 |          1 | 11 (7-20) | 125 (84-163)  | 25 (16-39) | 59 (48-68)    | 100 (86-117)  | 148 (130-162) |
+| M   | Dependent (0-1) |           4 |        5 |          0 | 1 (0-1)   | 59 (30-83)    | 35 (35-35) | 42 (36-48)    | 72 (60-84)    | 112 (96-128)  |
+| M   | Subadult (2-6)  |          17 |       21 |          3 | 4 (2-6)   | 112 (76-156)  | 23 (6-30)  | 56 (48-67)    | 96 (86-111)   | 147 (128-170) |
+| M   | Adult (\>6)     |          17 |       27 |          2 | 12 (7-27) | 210 (139-269) | 26 (16-39) | 75 (61-86)    | 121 (104-136) | 172 (154-183) |
+
 # Survival
 
 ## Prep survival data
-```{r Prep survival data, fig.height=9, fig.width=7.5, message=FALSE, warning=FALSE}
+
+``` r
 ##Prep survival data
 surv.raw <- cap%>%
   drop_na(ColBrand)%>% #keep only collared bears
@@ -432,8 +449,8 @@ surv.yr%>%
 ```
 
 ## Estimate survival
-```{r surv est, fig.height=6, fig.width=7, message=FALSE, warning=FALSE}
 
+``` r
 fit <- survfit(Surv(time, event) ~ sex + ageclass, data = surv.yr, conf.type = "log-log")
 ggsurvplot(fit, 
            pval = TRUE,
@@ -443,8 +460,11 @@ ggsurvplot(fit,
            ggtheme = theme_ipsum(), # Change ggplot2 theme
            ylim = c(0.5,1),
            xlim=c(0,360))
+```
 
+![](README_files/figure-gfm/surv%20est-1.png)<!-- -->
 
+``` r
 out<-summary(
   survfit(
     Surv(enter, exit, event)~sex + ageclass, 
@@ -481,9 +501,11 @@ ggplot(surv.yr.est%>%filter(ageclass%in%c(">6","2-6")) , aes(x=sex, y=est,ymin=l
         legend.title=element_text(size=15))
 ```
 
-## bootstrap to get error distribtion
-```{r surv.boot, fig.height=6, fig.width=6, message=FALSE, warning=FALSE}
+![](README_files/figure-gfm/surv%20est-2.png)<!-- -->
 
+## bootstrap to get error distribtion
+
+``` r
 surv.boot <- data.frame()
 mort.add <- tibble(dplyr::slice(surv.yr%>%ungroup,1))%>%
   dplyr::mutate(event=1,
@@ -539,15 +561,13 @@ survival.plot <- ggplot()+
 survival.plot 
 ```
 
-
-
-  
-
+![](README_files/figure-gfm/surv.boot-1.png)<!-- -->
 
 # Reproduction
 
 ## Prep reproduction data
-```{r prep repro, fig.height=6, fig.width=7.5, message=FALSE, warning=FALSE}
+
+``` r
 cubs <- cubs.raw%>%
   select(id=`Capture ID`,
          Date,
@@ -651,8 +671,11 @@ cubs%>%
         legend.text = element_text(size=13),
         legend.title=element_text(size=15),
         legend.position = "bottom")
+```
 
+![](README_files/figure-gfm/prep%20repro-1.png)<!-- -->
 
+``` r
 cubs%>%
   ungroup%>%
   mutate(cub.ageclass=case_when(is.na(cub.ageclass)~"No cubs",
@@ -676,7 +699,11 @@ cubs%>%
         legend.text = element_text(size=13),
         legend.title=element_text(size=15),
         legend.position = "bottom")
+```
 
+![](README_files/figure-gfm/prep%20repro-2.png)<!-- -->
+
+``` r
 ggsave(here::here("plots","repro_age.png"), width=10, height=8, bg="white")
 
 
@@ -701,9 +728,15 @@ cub.summary <- cub.expand%>%
 kable(cub.summary)
 ```
 
+| cub.age |  survival |   n | survived |        se | ageclass |
+|--------:|----------:|----:|---------:|----------:|:---------|
+|       0 | 0.7307692 |  26 |       19 | 0.0869893 | 0        |
+|       1 | 0.7333333 |  15 |       11 | 0.1141798 | 1        |
+|       2 | 0.6666667 |   3 |        2 | 0.2721655 | 2        |
 
 ## bootstrap cub surv
-```{r cub.surv.boot, fig.height=6, fig.width=7, message=FALSE, warning=FALSE}
+
+``` r
 cubsurv.boot<- data.frame()
 set.seed(2022)
 for(i in 1:5000){
@@ -751,9 +784,18 @@ write_csv(surv.boot.all.summary, here::here("tables/surv.csv"))
 kable(surv.boot.all.summary)
 ```
 
-## Estimate reproduction rate
-```{r cub.repro.boot, fig.height=6, fig.width=7, message=FALSE, warning=FALSE}
+| ageclass | sex | param    | median.boot |   sd.boot |     lower |     upper |
+|:---------|:----|:---------|------------:|----------:|----------:|----------:|
+| \>6      | F   | survival |   0.9591837 | 0.0285496 | 0.9069767 | 1.0000000 |
+| \>6      | M   | survival |   0.9444444 | 0.0580664 | 0.8333333 | 1.0000000 |
+| 0-1      | F   | survival |   0.7317073 | 0.0680960 | 0.6097561 | 0.8292683 |
+| 0-1      | M   | survival |   0.7317073 | 0.0680960 | 0.6097561 | 0.8292683 |
+| 2-6      | F   | survival |   0.7171682 | 0.1018158 | 0.5426052 | 0.8750000 |
+| 2-6      | M   | survival |   0.5959043 | 0.1361009 | 0.3769668 | 0.8203225 |
 
+## Estimate reproduction rate
+
+``` r
 cubs%>%
   filter(mom.ageclass!="0-4")%>%
   mutate(repro=case_when(cub.ageclass=="COY"~n.cubs,
@@ -825,13 +867,22 @@ repro.plot <- ggplot()+
         legend.position = "none")
 
 repro.plot
+```
 
+![](README_files/figure-gfm/cub.repro.boot-1.png)<!-- -->
+
+``` r
 kable(repro.boot.summary)
 ```
 
-## Age of primiparity estimation from Garshelis et al. 1998
-```{r primiparity, fig.height=6, fig.width=7, message=FALSE, warning=FALSE}
+| ageclass | param        | median.boot |   sd.boot |     lower |     upper |
+|:---------|:-------------|------------:|----------:|----------:|----------:|
+| \>6      | reproduction |   0.2348485 | 0.0528292 | 0.1515152 | 0.3257576 |
+| 5-6      | reproduction |   0.1538462 | 0.0982288 | 0.0000000 | 0.3076923 |
 
+## Age of primiparity estimation from Garshelis et al. 1998
+
+``` r
 primipar <- cubs%>%
   ungroup%>%
   filter(mom.agecub0%in%5:9,
@@ -839,8 +890,11 @@ primipar <- cubs%>%
          litter==1 | is.na(litter))
 
 primipar%>%distinct(id)%>%nrow()
+```
 
+    ## [1] 16
 
+``` r
 ##impute records for F observed post COY, but likely first litter
 input.par <- primipar%>%
   drop_na(cub.ageclass)%>%
@@ -917,15 +971,20 @@ primip.summary <- primip.summary%>%
 
 
 kable(primip.summary)
-
-
 ```
 
-
+| mom.age | null | first | prop.cubs | perc.avail | perc.prod |        wt |
+|:--------|-----:|------:|----------:|-----------:|----------:|----------:|
+| 5       |   16 |     2 | 0.1250000 |  100.00000 |  12.50000 | 0.8940397 |
+| 6       |   14 |     1 | 0.0714286 |   87.50000 |   6.25000 | 0.5364238 |
+| 7       |    9 |     2 | 0.2222222 |   81.25000 |  18.05556 | 1.8079470 |
+| 8       |    7 |     2 | 0.2857143 |   63.19444 |  18.05556 | 2.0662252 |
+| 9       |    3 |     1 | 0.3333333 |   45.13889 |  15.04630 | 1.9370861 |
+| Total   |   NA |    NA |        NA |         NA |        NA | 7.2417219 |
 
 # Population growth
 
-```{r pop growth, fig.height=6, fig.width=7, message=FALSE, warning=FALSE}
+``` r
 ##FEMALE ONLY
 Px <- c(rep(surv.boot.all.summary[3,"median.boot"][[1]],times=2),rep(surv.boot.all.summary[5,"median.boot"][[1]], times=5),rep(surv.boot.all.summary[1,"median.boot"][[1]], times=19),0)
 Fx <- c(rep(0,times=5),rep(repro.boot.summary[2,"median.boot"][[1]]*.5, times=2),rep(repro.boot.summary[1,"median.boot"][[1]]*.5, times=21)) ##divided by two to represent females only
@@ -933,8 +992,11 @@ L <- odiag(Px, -1)
 L[1, ] <- Fx
 
 eigen(L)$values[1]
+```
 
+    ## [1] 0.9061113+0i
 
+``` r
 ##boot
 lambda.boot <- data.frame()
 imi.boot <- data.frame()
@@ -967,7 +1029,13 @@ lambda.summary <- lambda.boot%>%
             below1=mean(l<1))
 
 kable(lambda.summary)
+```
 
+| median.boot |   sd.boot |    upper |     lower | below1 |
+|------------:|----------:|---------:|----------:|-------:|
+|   0.9387524 | 0.0442179 | 1.007691 | 0.8633229 | 0.9268 |
+
+``` r
 imi.boot%>%
   mutate(l=as.numeric(imi))%>%
   summarise(median.boot=median(l),
@@ -976,7 +1044,13 @@ imi.boot%>%
             lower=quantile(l,0.05),
             below1=mean(l>0))%>%
   kable()
+```
 
+| median.boot |   sd.boot |     upper |     lower | below1 |
+|------------:|----------:|----------:|----------:|-------:|
+|   0.0691723 | 0.0442179 | 0.1446019 | 0.0002338 | 0.9508 |
+
+``` r
 lambda.plot <-ggplot()+
   stat_slab(data=lambda.boot,aes(x=l%>%as.numeric%>%round(2)), justification=-0.05)+
     geom_linerange(data=lambda.boot%>%summarise(upper=quantile(l%>%as.numeric,0.975),
@@ -1003,10 +1077,11 @@ lambda.plot <-ggplot()+
 lambda.plot
 ```
 
+![](README_files/figure-gfm/pop%20growth-1.png)<!-- -->
 
 ## CI Data
-```{r CI, fig.height=6, fig.width=7, message=FALSE, warning=FALSE}
 
+``` r
 ##There were two kills from MU 423 without a location in CI data. 
 ##One was EVGM103 which said “Alpine Trails” and the other was an illegal kill in Brule Creek
 ##CL added these manually to data
@@ -1059,10 +1134,19 @@ ci.spat <- ci.spat%>%
 ##BC grizz range area
 range%>%st_make_valid()%>%
   st_intersection(pnw%>%filter(prov=="BC")%>%st_make_valid())%>%st_area()%>%set_units("km^2") ##764,330 km2
+```
 
+    ## Units: [km^2]
+    ## [1]      0.0 764330.2      0.0      0.0      0.0
+
+``` r
 ##EV study area
 sa%>%st_area()%>%set_units("km^2") ##5,073 km2
+```
 
+    ## 5073.642 [km^2]
+
+``` r
 ##null expected proportion=5125/(764330)=0.67%
 
 ##compare prevelance
@@ -1090,10 +1174,17 @@ write_csv(ci.compare, here::here("tables","ci.compare.csv"))
 kable(ci.compare)
 ```
 
+| source              | Elk Valley | Rest of BC  | Elk Valley share (%) | Excess (x higher than expected) |
+|:--------------------|:-----------|:------------|---------------------:|--------------------------------:|
+| Human-bear conflict | 10.91 (56) | 1.01 (764)  |                    7 |                              11 |
+| Hunter              | 14.22 (73) | 5.72 (4340) |                    2 |                               2 |
+| Poaching            | 2.53 (13)  | 0.24 (183)  |                    7 |                              11 |
+| Rail                | 3.7 (19)   | 0.03 (26)   |                   42 |                             108 |
+| Road                | 3.51 (18)  | 0.05 (37)   |                   33 |                              72 |
+
 ## Mortality sources and reporting rates
 
-```{r unreported, fig.height=6, fig.width=7, message=FALSE, warning=FALSE}
-
+``` r
 ###sources of mortality
 mort<- mort.raw%>%
   mutate(cause_grouped=case_when(`Suspected Cause of Mortality?`%in%c("Collision (road OR rail), Predation","Rail","Road")~"Road/Rail",
@@ -1146,7 +1237,11 @@ mort.table <- mort%>%
   mutate(unreporting.rate=No/(Yes+No))
 
 (sum(mort.table$No)-1)/(sum(mort.table$No+mort.table$Yes)-1)
+```
 
+    ## [1] 0.5384615
+
+``` r
 ##reporting rate with error
 report.boot <- c()
 
@@ -1159,15 +1254,34 @@ report.boot[i] <-mort%>%
 }
   
 mean(report.boot)
+```
+
+    ## [1] 0.5373385
+
+``` r
 mort%>%
   dplyr::filter(monitored=="Yes" & cause_grouped!="Natural")%>%
   dplyr::summarise(unreported=sum(reported=="No")/n())%>%
   dplyr::pull(unreported)
+```
+
+    ## [1] 0.5384615
+
+``` r
 quantile(report.boot,0.95)
+```
+
+    ##       95% 
+    ## 0.7692308
+
+``` r
 quantile(report.boot,0.05)
+```
 
+    ##        5% 
+    ## 0.3076923
 
-
+``` r
 ##another way of estimating unreported by cause using ear tags
 co.eartag.rate <- mort%>%
   filter(cause_grouped_cos!="Natural" & id!="EVGF111")%>% ##remove "EVGF111" she was killed with Melissa, not independent event
@@ -1204,10 +1318,11 @@ unreported.v2 <- mort%>%
          unreported.rate.v2=1-((n.all-n.unreported)/expected))
 
 1-((unreported.v2$n.all[5]-unreported.v2$n.unreported[5])/(unreported.v2$n.monitored[5]/co.eartag.rate ))
+```
 
+    ## [1] 0.7606838
 
-
-
+``` r
 ##boot
 report.boot2 <- tibble()
 
@@ -1238,9 +1353,25 @@ report.boot2 <- dat.i %>%
 
 
 median(report.boot2$unreported.bootall)
-quantile(report.boot2$unreported.bootall,0.95)
-quantile(report.boot2$unreported.bootall,0.05)
+```
 
+    ## [1] 0.7619048
+
+``` r
+quantile(report.boot2$unreported.bootall,0.95)
+```
+
+    ## 95% 
+    ##   1
+
+``` r
+quantile(report.boot2$unreported.bootall,0.05)
+```
+
+    ##        5% 
+    ## 0.5424837
+
+``` r
 # median(report.boot2$unreported.boot)
 # quantile(report.boot2$unreported.boot,0.9)
 # quantile(report.boot2$unreported.boot,0.1)
@@ -1306,10 +1437,26 @@ for(i in 1:5000){
 report.boot3[report.boot3<0] <- 0
 
 quantile(report.boot3,0.5, na.rm=TRUE)
+```
+
+    ##       50% 
+    ## 0.6727273
+
+``` r
 quantile(report.boot3,0.95, na.rm=TRUE)
+```
+
+    ##       95% 
+    ## 0.8888889
+
+``` r
 quantile(report.boot3,0.05, na.rm=TRUE)
+```
 
+    ## 5% 
+    ##  0
 
+``` r
 ##approach 3 for each type
 types <- unreported.v2$cause_grouped_cos[1:3]
 unreported.rate.v3 <- tibble()
@@ -1352,11 +1499,26 @@ ensemble <- uncrecorded.plot.dat%>%
   summarise(mean=mean(value))%>%
   pull(mean)
 quantile(ensemble,0.5, na.rm=TRUE)
+```
+
+    ##       50% 
+    ## 0.6482399
+
+``` r
 quantile(ensemble,0.05, na.rm=TRUE)
+```
+
+    ##        5% 
+    ## 0.4212767
+
+``` r
 quantile(ensemble,0.95, na.rm=TRUE)
+```
 
+    ##      95% 
+    ## 0.793512
 
-
+``` r
 uncrecorded.plot.dat <- uncrecorded.plot.dat%>%
   rbind(tibble(Method="Ensemble",
                value=ensemble,
@@ -1385,8 +1547,11 @@ uncrecorded.plot <-ggplot(data=uncrecorded.plot.dat%>%mutate(Method=fct_relevel(
 
 ##time to extirpation
 90*(lambda.summary$median.boot^35)
+```
 
+    ## [1] 9.852133
 
+``` r
 ##put into cleaner table summarizing both
 unreported.table <- unreported.v2%>%
   mutate(monitored=paste0(n.monitored, " (",n.unreported,")"),
@@ -1411,8 +1576,17 @@ write_csv(unreported.table, here::here("tables/unreported.csv"))
 kable(unreported.table)
 ```
 
-## Plot Others' Survival
-```{r others surv, fig.height=12, fig.width=13, message=FALSE, warning=FALSE}
+| Cause               | monitored | tagged returned (reported) | tagged expected | CI reported | unreported (collar method) | unreported (eartag method) | unreported (CI method) |
+|:--------------------|:----------|---------------------------:|----------------:|------------:|---------------------------:|---------------------------:|-----------------------:|
+| Conflict            | 4 (2)     |                          2 |            18.0 |           9 |                       0.50 |                       0.89 |                   0.68 |
+| Conflict-COS        | 2 (0)     |                          9 |             9.0 |          14 |                       0.00 |                       0.00 |                   0.00 |
+| Road/Rail           | 6 (4)     |                          3 |            27.0 |          11 |                       0.67 |                       0.89 |                   0.74 |
+| Unk-human suspected | 1 (1)     |                          0 |             4.5 |           0 |                       1.00 |                       1.00 |                   0.00 |
+| Total               | 13 (7)    |                         14 |            58.5 |          34 |                       0.54 |                       0.76 |                   0.64 |
+
+## Plot Others’ Survival
+
+``` r
 ##boot yellowstone survival
 ##mort and month counts taken from Schwartz et al. 2006
 # gye <- tibble(sex=c("F","F","M","M"),
@@ -1473,9 +1647,11 @@ ggsave(plot=fig3, here::here("plots/demog_plate.png"), width=13, height=12, bg="
 fig3 
 ```
 
-## Maps
-```{r maps, fig.height=6, fig.width=7, message=FALSE, warning=FALSE}
+![](README_files/figure-gfm/others%20surv-1.png)<!-- -->
 
+## Maps
+
+``` r
 ###Map captures, morts, and telemetry data
 
 ##prep some spatial data
@@ -1487,14 +1663,46 @@ cities <- st_read(here::here("data/administrative/places.shp"))%>%
   st_transform(4326)%>%
   rbind(tibble(Name="Elkford", Y=50.02, X=-114.921)%>%st_as_sf(coords=c("X","Y"),crs=4326))%>%
   st_transform(3005)
+```
 
+    ## Reading layer `places' from data source 
+    ##   `/Users/claytonlamb/Dropbox/Documents/University/PDF/PDF Analyses/ElkValley_Grizzly_Demography_22/data/administrative/places.shp' 
+    ##   using driver `ESRI Shapefile'
+    ## Simple feature collection with 787 features and 3 fields
+    ## Geometry type: POINT
+    ## Dimension:     XY
+    ## Bounding box:  xmin: -134.9996 ymin: 48.37586 xmax: -114.6224 ymax: 59.92801
+    ## Geodetic CRS:  NAD27
+
+``` r
 ##disturbances
 hwy <- st_read(here::here("data/disturbance/hwy.shp"))
+```
+
+    ## Reading layer `hwy' from data source 
+    ##   `/Users/claytonlamb/Dropbox/Documents/University/PDF/PDF Analyses/ElkValley_Grizzly_Demography_22/data/disturbance/hwy.shp' 
+    ##   using driver `ESRI Shapefile'
+    ## Simple feature collection with 23904 features and 2 fields
+    ## Geometry type: LINESTRING
+    ## Dimension:     XY
+    ## Bounding box:  xmin: 459196.8 ymin: 5099605 xmax: 1021389 ymax: 5768250
+    ## Projected CRS: NAD83 / UTM zone 11N
+
+``` r
 mines <- st_read(here::here("data/disturbance/mine_dist_ann.shp"))%>%
   filter(year==max(year))
+```
 
+    ## Reading layer `mine_dist_ann' from data source 
+    ##   `/Users/claytonlamb/Dropbox/Documents/University/PDF/PDF Analyses/ElkValley_Grizzly_Demography_22/data/disturbance/mine_dist_ann.shp' 
+    ##   using driver `ESRI Shapefile'
+    ## Simple feature collection with 105 features and 2 fields
+    ## Geometry type: MULTIPOLYGON
+    ## Dimension:     XY
+    ## Bounding box:  xmin: 647821.7 ymin: 5482934 xmax: 671106 ymax: 5568438
+    ## Projected CRS: NAD83 / UTM zone 11N
 
-
+``` r
 ##inset
 ##custom crs to keep things straight
 cust.crs <- "+proj=aea +lat_0=50 +lon_0=-114.9 +lat_1=49 +lat_2=50.5 +x_0=1000000 +y_0=0 +datum=NAD83 +units=m +no_defs"
@@ -1525,10 +1733,18 @@ register_google("AIzaSyCOwGx2D77XOqRgGhKmcb5F4Kt_S61tCLI")
 
 bmap.big <- basemap_raster(ext=sa%>%st_buffer(30000)%>%st_transform(3857),
                         map_res=1)%>%projectRaster(crs=cust.crs)
+```
 
+    ## Loading basemap 'terrain' from map service 'osm_stamen'...
+
+``` r
 bmap.small <- basemap_raster(ext=sa%>%st_buffer(10000)%>%st_transform(3857),
                     map_res=1)%>%projectRaster(crs=cust.crs)
+```
 
+    ## Loading basemap 'terrain' from map service 'osm_stamen'...
+
+``` r
 ggRGB(bmap.big , r=1, g=2, b=3)+
   theme_bw()+
   geom_sf(data = hwy%>%st_transform(cust.crs), aes(color="Highway"),size=0.7) +
@@ -1561,7 +1777,11 @@ ggRGB(bmap.big , r=1, g=2, b=3)+
          color = guide_legend(order = 1, reverse=TRUE)) +
   scale_color_manual(values = c("Highway"="black", "Study area"="grey90"))+
   scale_fill_manual(values = c("Coal mine"="black"))
+```
 
+![](README_files/figure-gfm/maps-1.png)<!-- -->
+
+``` r
 ggsave(here::here("plots/sa_map.boot.png"), width=8, height=10, bg="white")
 
 
@@ -1587,8 +1807,11 @@ ggRGB(bmap.small, r=1, g=2, b=3)+
        fill="")+
   scale_x_continuous(expand = c(0,0), limits = c(943588.1,1029124))+
   scale_y_continuous(expand = c(0,0), limits = c(-104054.3,50787.66))
+```
 
+![](README_files/figure-gfm/maps-2.png)<!-- -->
 
+``` r
 cap.plot <- ggRGB(bmap.small, r=1, g=2, b=3)+
   theme_bw()+
   geom_sf(data=sa%>%st_transform(cust.crs), inherit.aes = FALSE, fill=NA, color="grey90",size=0.8)+
@@ -1661,8 +1884,11 @@ grid <- conflict %>%
 #mapview(grid["conf.dens"])
 
 mean(grid$conf.dens)
+```
 
+    ## [1] 5.785677
 
+``` r
 conflict.ev <- conflict%>%
   st_transform(st_crs(sa))%>%
   st_intersection(sa)
@@ -1776,7 +2002,26 @@ disp <- disp%>%
              type="natal")%>%
       st_transform(crs = 4326)%>%
       select(id, Date, type))
+```
 
+    ## Reading layer `locs_2016' from data source 
+    ##   `/Users/claytonlamb/Dropbox/Documents/University/PDF/PDF Analyses/ElkValley_Grizzly_Demography_22/data/telem/dispersbears/Bear163/locs_2016.shp' 
+    ##   using driver `ESRI Shapefile'
+    ## Simple feature collection with 252 features and 48 fields
+    ## Geometry type: POINT
+    ## Dimension:     XY
+    ## Bounding box:  xmin: -115.1735 ymin: 50.59842 xmax: -115.0693 ymax: 50.92693
+    ## Geodetic CRS:  WGS 84
+    ## Reading layer `locs_2017' from data source 
+    ##   `/Users/claytonlamb/Dropbox/Documents/University/PDF/PDF Analyses/ElkValley_Grizzly_Demography_22/data/telem/dispersbears/Bear163/locs_2017.shp' 
+    ##   using driver `ESRI Shapefile'
+    ## Simple feature collection with 62 features and 62 fields
+    ## Geometry type: POINT
+    ## Dimension:     XY
+    ## Bounding box:  xmin: -115.1842 ymin: 50.62482 xmax: -115.109 ymax: 50.71597
+    ## Geodetic CRS:  WGS 84
+
+``` r
 #Add Sid AB data
 disp <- disp%>%
   rbind(
@@ -1790,8 +2035,18 @@ disp <- disp%>%
                         TRUE~type))%>%
     select(id, Date, type)
   )
+```
 
+    ## Reading layer `Bear162' from data source 
+    ##   `/Users/claytonlamb/Dropbox/Documents/University/PDF/PDF Analyses/ElkValley_Grizzly_Demography_22/data/telem/dispersbears/Bear162/Bear162.shp' 
+    ##   using driver `ESRI Shapefile'
+    ## Simple feature collection with 896 features and 32 fields
+    ## Geometry type: POINT
+    ## Dimension:     XY
+    ## Bounding box:  xmin: -1.797693e+308 ymin: -1.797693e+308 xmax: -114.8253 ymax: 50.78919
+    ## Geodetic CRS:  WGS 84
 
+``` r
 #Add Matt USA data
 disp <- disp%>%
   rbind(
@@ -1808,7 +2063,26 @@ disp <- disp%>%
              type="natal")%>%
       st_transform(crs = 4326)%>%
       select(id, Date, type))
+```
 
+    ## Reading layer `GB810_MattsMom_GPSVHFLocs' from data source 
+    ##   `/Users/claytonlamb/Dropbox/Documents/University/PDF/PDF Analyses/ElkValley_Grizzly_Demography_22/data/telem/dispersbears/GB810_MattsMom_GPSVHFLocs/GB810_MattsMom_GPSVHFLocs.shp' 
+    ##   using driver `ESRI Shapefile'
+    ## Simple feature collection with 1408 features and 18 fields
+    ## Geometry type: POINT
+    ## Dimension:     XY
+    ## Bounding box:  xmin: -116.1643 ymin: 48.78457 xmax: -115.9272 ymax: 48.95825
+    ## Geodetic CRS:  WGS 84
+    ## Reading layer `GB18986_Matt_DNAHits' from data source 
+    ##   `/Users/claytonlamb/Dropbox/Documents/University/PDF/PDF Analyses/ElkValley_Grizzly_Demography_22/data/telem/dispersbears/GB18986_Matt_DNAHits/GB18986_Matt_DNAHits.shp' 
+    ##   using driver `ESRI Shapefile'
+    ## Simple feature collection with 16 features and 16 fields
+    ## Geometry type: POINT
+    ## Dimension:     XY
+    ## Bounding box:  xmin: -116.1262 ymin: 48.81362 xmax: -116.02 ymax: 48.935
+    ## Geodetic CRS:  WGS 84
+
+``` r
 disp <- disp%>%
   st_transform(cust.crs)%>%
   cbind(st_coordinates(.))%>%
@@ -1821,7 +2095,11 @@ disp <- disp%>%
 bear.line <- disp%>%group_by(id)%>%arrange(Date)%>%summarize(do_union=FALSE) %>% st_cast("LINESTRING")
 bmap.imi <- basemap_raster(ext=disp%>%st_buffer(30000)%>%st_transform(3857),
                            map_res=1)%>%projectRaster(crs=cust.crs)
+```
 
+    ## Loading basemap 'terrain' from map service 'osm_stamen'...
+
+``` r
 imi.map <- ggRGB(bmap.imi, r=1, g=2, b=3)+
   theme_bw()+
   geom_sf(data=sa%>%st_transform(cust.crs), inherit.aes = FALSE, fill=NA, color="grey90")+
@@ -1857,18 +2135,11 @@ imi.map <- ggRGB(bmap.imi, r=1, g=2, b=3)+
 imi.map
 ```
 
-
-
-
-
-
-
-
-
+![](README_files/figure-gfm/maps-3.png)<!-- -->
 
 ## Plot SCR Density and simulate trends
-```{r DNA sim, fig.height=6, fig.width=7, message=FALSE, warning=FALSE}
 
+``` r
 ###ADD in ALL DNA 2006 onwards to show stability?
 start.year <- 2016
 secr.pred <- read_csv(here::here("data","caprecap","dens.pred.annual.csv"))%>%
@@ -1962,8 +2233,14 @@ annotate("text", x = 2037,  y =60,
   guides(linetype = "none")
 
 abund.proj 
+```
 
+![](README_files/figure-gfm/DNA%20sim-1.png)<!-- -->
+
+``` r
 fig6 <- imi.map+(lambda.plot/abund.proj)+plot_layout(widths=c(1.5,1))
 ggsave(plot=fig6, here::here("plots/imi_plate.png"), width=12, height=11, bg="white")
 fig6
 ```
+
+![](README_files/figure-gfm/DNA%20sim-2.png)<!-- -->
