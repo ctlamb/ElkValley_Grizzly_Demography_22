@@ -1,0 +1,6 @@
+Cause,monitored,tagged returned (reported),tagged expected,CI reported,unreported (collar method),unreported (eartag method),unreported (CI method)
+Conflict,4 (2),2,18,9,0.5,0.89,0.68
+Conflict-COS,2 (0),9,9,14,0,0,0
+Road/Rail,6 (4),3,27,11,0.67,0.89,0.74
+Unk-human suspected,1 (1),0,4.5,0,1,1,0
+Total,13 (7),14,58.5,34,0.54,0.76,0.64

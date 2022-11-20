@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="last" id="last">
+	<SimpleField name="ID" type="string"></SimpleField>
+	<SimpleField name="DateTime" type="string"></SimpleField>
+	<SimpleField name="DOP" type="string"></SimpleField>
+	<SimpleField name="Brand" type="string"></SimpleField>
+</Schema>
+<Folder><name>last</name>
+  <Placemark>
+	<name>Christina</name>
+	<ExtendedData><SchemaData schemaUrl="#last">
+		<SimpleData name="ID">21404</SimpleData>
+		<SimpleData name="DateTime">2018-10-27 00:01:56</SimpleData>
+		<SimpleData name="DOP">3</SimpleData>
+		<SimpleData name="Brand">Vectronic</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-115.1053582,49.3563921</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Jerry</name>
+	<ExtendedData><SchemaData schemaUrl="#last">
+		<SimpleData name="DateTime">2019-07-12 16:00:00</SimpleData>
+		<SimpleData name="Brand">Followit</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-114.981825,49.636078</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Joe</name>
+	<ExtendedData><SchemaData schemaUrl="#last">
+		<SimpleData name="DateTime">2018-04-05 02:27:00</SimpleData>
+		<SimpleData name="Brand">Followit</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-115.011408,49.573063</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Olson</name>
+	<ExtendedData><SchemaData schemaUrl="#last">
+		<SimpleData name="DateTime">2019-02-11 06:01:00</SimpleData>
+		<SimpleData name="Brand">Followit</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-114.833925,49.555693</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Phoebe</name>
+	<ExtendedData><SchemaData schemaUrl="#last">
+		<SimpleData name="ID">6062</SimpleData>
+		<SimpleData name="DateTime">2017-11-06 06:00:00</SimpleData>
+		<SimpleData name="DOP">0.9</SimpleData>
+		<SimpleData name="Brand">Followit</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-114.914082,49.699605</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<name>Trish</name>
+	<ExtendedData><SchemaData schemaUrl="#last">
+		<SimpleData name="DateTime">2018-08-28 00:00:00</SimpleData>
+		<SimpleData name="Brand">Followit</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>-114.941733,49.60616</coordinates></Point>
+  </Placemark>
+</Folder>
+</Document></kml>
