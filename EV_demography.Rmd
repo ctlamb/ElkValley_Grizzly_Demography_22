@@ -1474,7 +1474,7 @@ fig3
 ```
 
 ## Maps
-```{r maps, fig.height=6, fig.width=7, message=FALSE, warning=FALSE}
+```{r maps, fig.height=10, fig.width=8, message=FALSE, warning=FALSE}
 
 ###Map captures, morts, and telemetry data
 
@@ -1867,7 +1867,7 @@ imi.map
 
 
 ## Plot SCR Density and simulate trends
-```{r DNA sim, fig.height=6, fig.width=7, message=FALSE, warning=FALSE}
+```{r DNA sim, fig.height=11, fig.width=12, message=FALSE, warning=FALSE}
 
 ###ADD in ALL DNA 2006 onwards to show stability?
 start.year <- 2016
