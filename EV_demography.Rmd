@@ -157,6 +157,7 @@ ggplot()+
   theme_classic()+
   labs(title="Study Area Extents", subtitle="Larger area is primary study area defined by 99th percentile of telemetry\nShaded is interior 5 km buffer for DNA capture-recapture encompassing homerange centers")
 
+ggsave(here::here("plots","study_extents.png"), width=8, height=10, bg="white")
 ```
 
 
@@ -928,7 +929,7 @@ kable(primip.summary)
 ```{r pop growth, fig.height=6, fig.width=7, message=FALSE, warning=FALSE}
 ##FEMALE ONLY
 Px <- c(rep(surv.boot.all.summary[3,"median.boot"][[1]],times=2),rep(surv.boot.all.summary[5,"median.boot"][[1]], times=5),rep(surv.boot.all.summary[1,"median.boot"][[1]], times=19),0)
-Fx <- c(rep(0,times=5),rep(repro.boot.summary[2,"median.boot"][[1]]*.5, times=2),rep(repro.boot.summary[1,"median.boot"][[1]]*.5, times=21)) ##divided by two to represent females only
+Fx <- c(rep(0,times=5),rep(repro.boot.summary[2,"median.boot"][[1]], times=2),rep(repro.boot.summary[1,"median.boot"][[1]], times=21))
 L <- odiag(Px, -1)
 L[1, ] <- Fx
 
@@ -1070,6 +1071,8 @@ ci.compare <- ci.spat%>%
   tibble%>%
   filter(year(date)>2000)%>%
   filter(!CID_NO%in%c("134689","134688","150302","150301","127132","137208"))%>% ##remove collared bears that would have been unreported if not collared
+  mutate(source=case_when(source%in%c("Poaching")~"Human-bear conflict",
+                             TRUE~source))%>%
   group_by(region)%>%
   count(source)%>%
   ungroup%>%
@@ -1282,12 +1285,7 @@ for(i in 1:5000){
   cos.col <- ev.ci.summary.i%>%dplyr::filter(type=="Collar"&source=="COS")%>%pull(n)
   hum.ci <- ev.ci.summary.i%>%dplyr::filter(type=="CI"&source=="human-caused")%>%pull(n)
   hum.col <- ev.ci.summary.i%>%dplyr::filter(type=="Collar"&source=="human-caused")%>%pull(n)
-  
-  #Mclellan 2018 #'s to check
-  # cos.ci <- 71
-  # cos.col <- 10
-  # hum.ci <- 10
-  # hum.col <- 12
+
   
   if(nrow(ev.ci.summary.i)==4){
     ci.unreported.n <- ((cos.ci/(cos.col/hum.col))-hum.ci)
@@ -1311,10 +1309,10 @@ quantile(report.boot3,0.05, na.rm=TRUE)
 
 
 ##approach 3 for each type
-types <- unreported.v2$cause_grouped_cos[1:3]
+types <- c(unreported.v2$cause_grouped_cos[1:3],"Hunter")
 unreported.rate.v3 <- tibble()
 ev.ci.summary.grp <- ev.ci%>%
-  mutate(source.co=case_when(source.co%in%c("Animal Control","Human-bear conflict")~"Conflict",
+  mutate(source.co=case_when(source.co%in%c("Animal Control","Human-bear conflict","Poaching")~"Conflict",
                              source.co%in%c("Rail","Road")~"Road/Rail",
                              TRUE~source.co))%>%
   group_by(type)%>%count(source.co)%>%ungroup
@@ -1324,12 +1322,15 @@ cos.ci.grp <- ev.ci.summary.grp%>%filter(type=="CI"&source.co=="Conflict-COS")%>
 cos.col.grp <- ev.ci.summary.grp%>%filter(type=="Collar"&source.co=="Conflict-COS")%>%pull(n)
 hum.ci.grp <- ev.ci.summary.grp%>%filter(type=="CI"&source.co==types[i])%>%pull(n)
 hum.col.grp <- ev.ci.summary.grp%>%filter(type=="Collar"&source.co==types[i])%>%pull(n)
-
+if(sum(hum.col.grp)==0){
+  hum.col.grp <-0
+}
 
 ci.unreported.n.grp <- ((cos.ci.grp/(cos.col.grp/hum.col.grp))-hum.ci.grp)
 
 ci.unreported.grp <- ci.unreported.n.grp/(ci.unreported.n.grp+hum.ci.grp)
 
+if(ci.unreported.grp<0){ci.unreported.grp <- 0}
 
 unreported.rate.v3 <- rbind(unreported.rate.v3, tibble(Cause=types[i], 
                                                        `CI reported`=hum.ci.grp,
@@ -1381,12 +1382,6 @@ uncrecorded.plot <-ggplot(data=uncrecorded.plot.dat%>%mutate(Method=fct_relevel(
   xlim(0,100)
 
 
-
-
-##time to extirpation
-90*(lambda.summary$median.boot^35)
-
-
 ##put into cleaner table summarizing both
 unreported.table <- unreported.v2%>%
   mutate(monitored=paste0(n.monitored, " (",n.unreported,")"),
@@ -1398,13 +1393,24 @@ unreported.table <- unreported.v2%>%
          `tagged expected`,
          `unreported (collar method)`=unreported.rate.v1,
          `unreported (eartag method)`=unreported.rate.v2)%>%
+    add_row(Cause="Hunter",monitored="0 (0)")%>%
+  mutate(Cause=factor( as.character(Cause), levels= c("Conflict","Conflict-COS","Road/Rail","Unk-human suspected","Hunter","Total") ))%>%
+  arrange(Cause)%>%
   left_join(unreported.rate.v3%>%
               bind_rows(summarise_all(., ~if(is.numeric(.)) sum(.) else "Total"))%>%
               mutate(`unreported (CI method)`=case_when(Cause=="Total"~ci.unreported,
                                                         TRUE~`unreported (CI method)`)))%>%
   mutate_if(is.numeric, round,2)%>%
+  relocate(`CI reported`, .after =  `tagged expected`)%>%
   mutate_if(is.numeric, ~replace_na(.x, 0))%>%
-  relocate(`CI reported`, .after =  `tagged expected`)
+    select(Cause,
+         monitored,
+         `CI reported`,
+         `tagged returned (reported)`, 
+         `tagged expected`,
+         `unreported (collar method)`,
+         `unreported (CI method)`,
+         `unreported (eartag method)`)
 
 write_csv(unreported.table, here::here("tables/unreported.csv"))
 
@@ -1869,7 +1875,7 @@ imi.map
 ## Plot SCR Density and simulate trends
 ```{r DNA sim, fig.height=11, fig.width=12, message=FALSE, warning=FALSE}
 
-###ADD in ALL DNA 2006 onwards to show stability?
+
 start.year <- 2016
 secr.pred <- read_csv(here::here("data","caprecap","dens.pred.annual.csv"))%>%
   mutate(se=D.se)%>%
@@ -1960,8 +1966,6 @@ annotate("text", x = 2037,  y =60,
          colour = "black",
          hjust = 1)+
   guides(linetype = "none")
-
-abund.proj 
 
 fig6 <- imi.map+(lambda.plot/abund.proj)+plot_layout(widths=c(1.5,1))
 ggsave(plot=fig6, here::here("plots/imi_plate.png"), width=12, height=11, bg="white")

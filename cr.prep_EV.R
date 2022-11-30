@@ -286,123 +286,123 @@ GBmask.o <- make.mask (rbind(traps(grizzCH)), buffer = 30000, type = 'trapbuffer
 plot(GBmask.o)
 
 
-
-##Find a top detection model
-trap.sex <- secr.fit(capthist = grizzCH, 
-                     mask=GBmask.o, 
-                     list(lambda0~trap + g, sigma~g, D~1), 
-                     detectfn="HHN",
-                     trace=TRUE, 
-                     ncores=8,
-                     groups = "sex",
-                     verify=FALSE,
-                     start=readRDS("mods/starts/trap.sex.rds"))
-
-saveRDS(trap.sex, "mods/trap.sex.rds")
-
-trap.bk <- secr.fit(capthist = grizzCH, 
-                    mask=GBmask.o, 
-                    list(lambda0~trap*bk + g, sigma~g, D~1), 
-                    detectfn="HHN",
-                    trace=TRUE, 
-                    ncores=8,
-                    groups = "sex",
-                    verify=FALSE,
-                    start=readRDS("mods/starts/trap.bk.rds"))
-
-saveRDS(trap.bk, "mods/trap.bk.rds")
-
-trap.pbk <- secr.fit(capthist = grizzCH, 
-                     mask=GBmask.o, 
-                     list(lambda0~trap + bk + g, sigma~g, D~1), 
-                     detectfn="HHN",
-                     trace=TRUE, 
-                     ncores=8,
-                     groups = "sex",
-                     verify=FALSE,
-                     start=readRDS("mods/starts/trap.pbk.rds"))
-
-saveRDS(trap.pbk, "mods/trap.pbk.rds")
-
-trap.bk.t <- secr.fit(capthist = grizzCH, 
-                    mask=GBmask.o, 
-                    list(lambda0~trap*bk + g + t, sigma~g, D~1), 
-                    detectfn="HHN",
-                    trace=TRUE, 
-                    ncores=8,
-                    groups = "sex",
-                    verify=FALSE,
-                    start=readRDS("mods/starts/trap.bk.t.rds"))
-
-saveRDS(trap.bk.t, "mods/trap.bk.t.rds")
-
-AIC(trap.sex, trap.bk,trap.pbk,trap.bk.t)
-collate(trap.sex, trap.bk,trap.pbk,trap.bk.t,
-        realnames='D', perm=c(2,3,4,1))
-
-##run trap.bk.t and trap.pbk, basically get same answer, use simple trap.pbk
-
-
-#### Detection fn
-trap.pbk.hn <- secr.fit(capthist = grizzCH, 
-                     mask=GBmask.o, 
-                     list(g0~trap + bk + g, sigma~g, D~1), 
-                     detectfn="HN",
-                     trace=TRUE, 
-                     ncores=8,
-                     groups = "sex",
-                     verify=FALSE,
-                     start=readRDS("mods/starts/trap.pbk.rds"))
-
-saveRDS(trap.pbk, "mods/trap.pbk.hn.rds")
-
-trap.pbk.hex <- secr.fit(capthist = grizzCH, 
-                        mask=GBmask.o, 
-                        list(lambda0~trap + bk + g, sigma~g, D~1), 
-                        detectfn="HEX",
-                        trace=TRUE, 
-                        ncores=8,
-                        groups = "sex",
-                        verify=FALSE,
-                        start=readRDS("mods/starts/trap.pbk.rds"))
-
-saveRDS(trap.pbk, "mods/trap.pbk.hex.rds")
-
-
-AIC(trap.pbk,trap.pbk.hn,trap.pbk.hex)
-
-collate(trap.pbk,trap.pbk.hn,trap.pbk.hex,
-        realnames='D', perm=c(2,3,4,1)) ##no effect on D
-
-collate(trap.pbk,trap.pbk.hn,trap.pbk.hex,
-        realnames='sigma', perm=c(2,3,4,1)) ##large effect on sigma, but HHN most plausable. Stick with that. Murray said caution needed with hex anyways.
-
-
-##sigma and lambda0 changes through time?
-trap.pbk.b <- secr.fit(capthist = grizzCH%>%subset(sessions=11:16), 
-                     mask=GBmask.o, 
-                     list(lambda0~trap + bk + g, sigma~g + Session, D~1), 
-                     detectfn="HHN",
-                     trace=TRUE, 
-                     ncores=8,
-                     groups = "sex",
-                     verify=FALSE)
-
-
-trap.pbk.c <- secr.fit(capthist = grizzCH%>%subset(sessions=11:16), 
-                       mask=GBmask.o, 
-                       list(lambda0~trap + bk + g + Session, sigma~g + Session, D~1), 
-                       detectfn="HHN",
-                       trace=TRUE, 
-                       ncores=8,
-                       groups = "sex",
-                       verify=FALSE)
-
-
-AIC(trap.pbk,trap.pbk.b,trap.pbk.c)
-
-collate(trap.pbk,trap.pbk.b,trap.pbk.c,
-        realnames='D', perm=c(2,3,4,1)) ##effect on D
+# 
+# ##Find a top detection model
+# trap.sex <- secr.fit(capthist = grizzCH, 
+#                      mask=GBmask.o, 
+#                      list(lambda0~trap + g, sigma~g, D~1), 
+#                      detectfn="HHN",
+#                      trace=TRUE, 
+#                      ncores=8,
+#                      groups = "sex",
+#                      verify=FALSE,
+#                      start=readRDS("mods/starts/trap.sex.rds"))
+# 
+# saveRDS(trap.sex, "mods/trap.sex.rds")
+# 
+# trap.bk <- secr.fit(capthist = grizzCH, 
+#                     mask=GBmask.o, 
+#                     list(lambda0~trap*bk + g, sigma~g, D~1), 
+#                     detectfn="HHN",
+#                     trace=TRUE, 
+#                     ncores=8,
+#                     groups = "sex",
+#                     verify=FALSE,
+#                     start=readRDS("mods/starts/trap.bk.rds"))
+# 
+# saveRDS(trap.bk, "mods/trap.bk.rds")
+# 
+# trap.pbk <- secr.fit(capthist = grizzCH, 
+#                      mask=GBmask.o, 
+#                      list(lambda0~trap + bk + g, sigma~g, D~1), 
+#                      detectfn="HHN",
+#                      trace=TRUE, 
+#                      ncores=8,
+#                      groups = "sex",
+#                      verify=FALSE,
+#                      start=readRDS("mods/starts/trap.pbk.rds"))
+# 
+# saveRDS(trap.pbk, "mods/trap.pbk.rds")
+# 
+# trap.bk.t <- secr.fit(capthist = grizzCH, 
+#                     mask=GBmask.o, 
+#                     list(lambda0~trap*bk + g + t, sigma~g, D~1), 
+#                     detectfn="HHN",
+#                     trace=TRUE, 
+#                     ncores=8,
+#                     groups = "sex",
+#                     verify=FALSE,
+#                     start=readRDS("mods/starts/trap.bk.t.rds"))
+# 
+# saveRDS(trap.bk.t, "mods/trap.bk.t.rds")
+# 
+# AIC(trap.sex, trap.bk,trap.pbk,trap.bk.t)
+# collate(trap.sex, trap.bk,trap.pbk,trap.bk.t,
+#         realnames='D', perm=c(2,3,4,1))
+# 
+# ##run trap.bk.t and trap.pbk, basically get same answer, use simple trap.pbk
+# 
+# 
+# #### Detection fn
+# trap.pbk.hn <- secr.fit(capthist = grizzCH, 
+#                      mask=GBmask.o, 
+#                      list(g0~trap + bk + g, sigma~g, D~1), 
+#                      detectfn="HN",
+#                      trace=TRUE, 
+#                      ncores=8,
+#                      groups = "sex",
+#                      verify=FALSE,
+#                      start=readRDS("mods/starts/trap.pbk.rds"))
+# 
+# saveRDS(trap.pbk, "mods/trap.pbk.hn.rds")
+# 
+# trap.pbk.hex <- secr.fit(capthist = grizzCH, 
+#                         mask=GBmask.o, 
+#                         list(lambda0~trap + bk + g, sigma~g, D~1), 
+#                         detectfn="HEX",
+#                         trace=TRUE, 
+#                         ncores=8,
+#                         groups = "sex",
+#                         verify=FALSE,
+#                         start=readRDS("mods/starts/trap.pbk.rds"))
+# 
+# saveRDS(trap.pbk, "mods/trap.pbk.hex.rds")
+# 
+# 
+# AIC(trap.pbk,trap.pbk.hn,trap.pbk.hex)
+# 
+# collate(trap.pbk,trap.pbk.hn,trap.pbk.hex,
+#         realnames='D', perm=c(2,3,4,1)) ##no effect on D
+# 
+# collate(trap.pbk,trap.pbk.hn,trap.pbk.hex,
+#         realnames='sigma', perm=c(2,3,4,1)) ##large effect on sigma, but HHN most plausable. Stick with that. Murray said caution needed with hex anyways.
+# 
+# 
+# ##sigma and lambda0 changes through time?
+# trap.pbk.b <- secr.fit(capthist = grizzCH%>%subset(sessions=11:16), 
+#                      mask=GBmask.o, 
+#                      list(lambda0~trap + bk + g, sigma~g + Session, D~1), 
+#                      detectfn="HHN",
+#                      trace=TRUE, 
+#                      ncores=8,
+#                      groups = "sex",
+#                      verify=FALSE)
+# 
+# 
+# trap.pbk.c <- secr.fit(capthist = grizzCH%>%subset(sessions=11:16), 
+#                        mask=GBmask.o, 
+#                        list(lambda0~trap + bk + g + Session, sigma~g + Session, D~1), 
+#                        detectfn="HHN",
+#                        trace=TRUE, 
+#                        ncores=8,
+#                        groups = "sex",
+#                        verify=FALSE)
+# 
+# 
+# AIC(trap.pbk,trap.pbk.b,trap.pbk.c)
+# 
+# collate(trap.pbk,trap.pbk.b,trap.pbk.c,
+#         realnames='D', perm=c(2,3,4,1)) ##effect on D
 
 
 
@@ -416,12 +416,14 @@ collate(trap.pbk,trap.pbk.b,trap.pbk.c,
 ##OPENCR modelling
 ##run model
 
-m1.open.starts<- openCR::openCR.fit(capthist = grizzCH, 
-                        mask=GBmask.o, 
-                        type = 'JSSAsecrbCL', 
-                        list(lambda0~trap + bk + sex, sigma~sex, lambda~1), 
-                        detectfn="HHN",
-                        ncores=8)
+# m1.open.starts<- openCR::openCR.fit(capthist = grizzCH, 
+#                         mask=GBmask.o, 
+#                         type = 'JSSAsecrbCL', 
+#                         list(lambda0~trap + bk + sex, sigma~sex, lambda~1), 
+#                         detectfn="HHN",
+#                         ncores=8)
+# 
+# saveRDS(m1.open.starts, "mods/starts/m1.open.starts.rds")
 
 
 m1o<- openCR::openCR.fit(capthist = grizzCH, 
@@ -430,7 +432,8 @@ m1o<- openCR::openCR.fit(capthist = grizzCH,
                          list(lambda0~trap + bk + sex, sigma~sex, lambda~1), 
                          detectfn="HHN",
                          ncores=8,
-                         start=m1.open.starts)
+                         start=c(-4.7,-1.7, 1, -0.4,  1.8, 0.02, 8.2,  1.1))
+saveRDS(m1o, "mods/m1o.rds")
 
 
 m1o.EVstudy <-  openCR::openCR.fit(capthist = grizzCH, 
@@ -440,21 +443,16 @@ m1o.EVstudy <-  openCR::openCR.fit(capthist = grizzCH,
                                        detectfn="HHN",
                                        sessioncov=c(rep("Early",times=10),rep("Late", times=6)),
                                        ncores=8,
-                                       start=c(m1.open$fit$estimate[1:6],-0.04,m1.open$fit$estimate[7:8]),
+                                       start=c(-4.7,-1.7, 1, -0.4,  1.8,  0.02, -0.04,  8.2,  1.1),
                                        trace=TRUE)
+saveRDS(m1o.EVstudy, "mods/m1o.EVstudy.rds")
+
+AIC(m1o,m1o.EVstudy) ##no support for splitting trend, stick with simpler m1o model
 
 
-  
-AIC(m1.open,m1.open.EVstudy)
-
-
-
-
-##save output
-saveRDS(m1, "mods/m1.rds")
 
 ##extract estimates
-ests <- predict(m1.open)$lambda%>%
+ests <- predict(m1o)$lambda%>%
   tibble%>%
   slice(1)%>%
   select(estimate:ucl)%>%

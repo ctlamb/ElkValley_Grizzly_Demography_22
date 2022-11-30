@@ -1,7 +1,7 @@
 Elk Valley Grizzly Demography 2016-2022
 ================
 Clayton T. Lamb
-20 November, 2022
+30 November, 2022
 
 ## Load Data
 
@@ -160,6 +160,10 @@ ggplot()+
 ```
 
 ![](README_files/figure-gfm/Delineate%20study%20area-1.png)<!-- -->
+
+``` r
+ggsave(here::here("plots","study_extents.png"), width=8, height=10, bg="white")
+```
 
 ## Capture data
 
@@ -987,14 +991,14 @@ kable(primip.summary)
 ``` r
 ##FEMALE ONLY
 Px <- c(rep(surv.boot.all.summary[3,"median.boot"][[1]],times=2),rep(surv.boot.all.summary[5,"median.boot"][[1]], times=5),rep(surv.boot.all.summary[1,"median.boot"][[1]], times=19),0)
-Fx <- c(rep(0,times=5),rep(repro.boot.summary[2,"median.boot"][[1]]*.5, times=2),rep(repro.boot.summary[1,"median.boot"][[1]]*.5, times=21)) ##divided by two to represent females only
+Fx <- c(rep(0,times=5),rep(repro.boot.summary[2,"median.boot"][[1]], times=2),rep(repro.boot.summary[1,"median.boot"][[1]], times=21))
 L <- odiag(Px, -1)
 L[1, ] <- Fx
 
 eigen(L)$values[1]
 ```
 
-    ## [1] 0.9061113+0i
+    ## [1] 0.9417364+0i
 
 ``` r
 ##boot
@@ -1154,6 +1158,8 @@ ci.compare <- ci.spat%>%
   tibble%>%
   filter(year(date)>2000)%>%
   filter(!CID_NO%in%c("134689","134688","150302","150301","127132","137208"))%>% ##remove collared bears that would have been unreported if not collared
+  mutate(source=case_when(source%in%c("Poaching")~"Human-bear conflict",
+                             TRUE~source))%>%
   group_by(region)%>%
   count(source)%>%
   ungroup%>%
@@ -1176,9 +1182,8 @@ kable(ci.compare)
 
 | source              | Elk Valley | Rest of BC  | Elk Valley share (%) | Excess (x higher than expected) |
 |:--------------------|:-----------|:------------|---------------------:|--------------------------------:|
-| Human-bear conflict | 10.91 (56) | 1.01 (764)  |                    7 |                              11 |
+| Human-bear conflict | 13.44 (69) | 1.25 (947)  |                    7 |                              11 |
 | Hunter              | 14.22 (73) | 5.72 (4340) |                    2 |                               2 |
-| Poaching            | 2.53 (13)  | 0.24 (183)  |                    7 |                              11 |
 | Rail                | 3.7 (19)   | 0.03 (26)   |                   42 |                             108 |
 | Road                | 3.51 (18)  | 0.05 (37)   |                   33 |                              72 |
 
@@ -1413,12 +1418,7 @@ for(i in 1:5000){
   cos.col <- ev.ci.summary.i%>%dplyr::filter(type=="Collar"&source=="COS")%>%pull(n)
   hum.ci <- ev.ci.summary.i%>%dplyr::filter(type=="CI"&source=="human-caused")%>%pull(n)
   hum.col <- ev.ci.summary.i%>%dplyr::filter(type=="Collar"&source=="human-caused")%>%pull(n)
-  
-  #Mclellan 2018 #'s to check
-  # cos.ci <- 71
-  # cos.col <- 10
-  # hum.ci <- 10
-  # hum.col <- 12
+
   
   if(nrow(ev.ci.summary.i)==4){
     ci.unreported.n <- ((cos.ci/(cos.col/hum.col))-hum.ci)
@@ -1458,10 +1458,10 @@ quantile(report.boot3,0.05, na.rm=TRUE)
 
 ``` r
 ##approach 3 for each type
-types <- unreported.v2$cause_grouped_cos[1:3]
+types <- c(unreported.v2$cause_grouped_cos[1:3],"Hunter")
 unreported.rate.v3 <- tibble()
 ev.ci.summary.grp <- ev.ci%>%
-  mutate(source.co=case_when(source.co%in%c("Animal Control","Human-bear conflict")~"Conflict",
+  mutate(source.co=case_when(source.co%in%c("Animal Control","Human-bear conflict","Poaching")~"Conflict",
                              source.co%in%c("Rail","Road")~"Road/Rail",
                              TRUE~source.co))%>%
   group_by(type)%>%count(source.co)%>%ungroup
@@ -1471,12 +1471,15 @@ cos.ci.grp <- ev.ci.summary.grp%>%filter(type=="CI"&source.co=="Conflict-COS")%>
 cos.col.grp <- ev.ci.summary.grp%>%filter(type=="Collar"&source.co=="Conflict-COS")%>%pull(n)
 hum.ci.grp <- ev.ci.summary.grp%>%filter(type=="CI"&source.co==types[i])%>%pull(n)
 hum.col.grp <- ev.ci.summary.grp%>%filter(type=="Collar"&source.co==types[i])%>%pull(n)
-
+if(sum(hum.col.grp)==0){
+  hum.col.grp <-0
+}
 
 ci.unreported.n.grp <- ((cos.ci.grp/(cos.col.grp/hum.col.grp))-hum.ci.grp)
 
 ci.unreported.grp <- ci.unreported.n.grp/(ci.unreported.n.grp+hum.ci.grp)
 
+if(ci.unreported.grp<0){ci.unreported.grp <- 0}
 
 unreported.rate.v3 <- rbind(unreported.rate.v3, tibble(Cause=types[i], 
                                                        `CI reported`=hum.ci.grp,
@@ -1543,15 +1546,6 @@ uncrecorded.plot <-ggplot(data=uncrecorded.plot.dat%>%mutate(Method=fct_relevel(
   xlim(0,100)
 
 
-
-
-##time to extirpation
-90*(lambda.summary$median.boot^35)
-```
-
-    ## [1] 9.852133
-
-``` r
 ##put into cleaner table summarizing both
 unreported.table <- unreported.v2%>%
   mutate(monitored=paste0(n.monitored, " (",n.unreported,")"),
@@ -1563,26 +1557,38 @@ unreported.table <- unreported.v2%>%
          `tagged expected`,
          `unreported (collar method)`=unreported.rate.v1,
          `unreported (eartag method)`=unreported.rate.v2)%>%
+    add_row(Cause="Hunter",monitored="0 (0)")%>%
+  mutate(Cause=factor( as.character(Cause), levels= c("Conflict","Conflict-COS","Road/Rail","Unk-human suspected","Hunter","Total") ))%>%
+  arrange(Cause)%>%
   left_join(unreported.rate.v3%>%
               bind_rows(summarise_all(., ~if(is.numeric(.)) sum(.) else "Total"))%>%
               mutate(`unreported (CI method)`=case_when(Cause=="Total"~ci.unreported,
                                                         TRUE~`unreported (CI method)`)))%>%
   mutate_if(is.numeric, round,2)%>%
+  relocate(`CI reported`, .after =  `tagged expected`)%>%
   mutate_if(is.numeric, ~replace_na(.x, 0))%>%
-  relocate(`CI reported`, .after =  `tagged expected`)
+    select(Cause,
+         monitored,
+         `CI reported`,
+         `tagged returned (reported)`, 
+         `tagged expected`,
+         `unreported (collar method)`,
+         `unreported (CI method)`,
+         `unreported (eartag method)`)
 
 write_csv(unreported.table, here::here("tables/unreported.csv"))
 
 kable(unreported.table)
 ```
 
-| Cause               | monitored | tagged returned (reported) | tagged expected | CI reported | unreported (collar method) | unreported (eartag method) | unreported (CI method) |
-|:--------------------|:----------|---------------------------:|----------------:|------------:|---------------------------:|---------------------------:|-----------------------:|
-| Conflict            | 4 (2)     |                          2 |            18.0 |           9 |                       0.50 |                       0.89 |                   0.68 |
-| Conflict-COS        | 2 (0)     |                          9 |             9.0 |          14 |                       0.00 |                       0.00 |                   0.00 |
-| Road/Rail           | 6 (4)     |                          3 |            27.0 |          11 |                       0.67 |                       0.89 |                   0.74 |
-| Unk-human suspected | 1 (1)     |                          0 |             4.5 |           0 |                       1.00 |                       1.00 |                   0.00 |
-| Total               | 13 (7)    |                         14 |            58.5 |          34 |                       0.54 |                       0.76 |                   0.64 |
+| Cause               | monitored | CI reported | tagged returned (reported) | tagged expected | unreported (collar method) | unreported (CI method) | unreported (eartag method) |
+|:--------------------|:----------|------------:|---------------------------:|----------------:|---------------------------:|-----------------------:|---------------------------:|
+| Conflict            | 4 (2)     |          14 |                          2 |            18.0 |                       0.50 |                   0.50 |                       0.89 |
+| Conflict-COS        | 2 (0)     |          14 |                          9 |             9.0 |                       0.00 |                   0.00 |                       0.00 |
+| Road/Rail           | 6 (4)     |          11 |                          3 |            27.0 |                       0.67 |                   0.74 |                       0.89 |
+| Unk-human suspected | 1 (1)     |           0 |                          0 |             4.5 |                       1.00 |                   0.00 |                       1.00 |
+| Hunter              | 0 (0)     |           3 |                          0 |             0.0 |                       0.00 |                   0.00 |                       0.00 |
+| Total               | 13 (7)    |          42 |                         14 |            58.5 |                       0.54 |                   0.64 |                       0.76 |
 
 ## Plot Others’ Survival
 
@@ -2140,7 +2146,6 @@ imi.map
 ## Plot SCR Density and simulate trends
 
 ``` r
-###ADD in ALL DNA 2006 onwards to show stability?
 start.year <- 2016
 secr.pred <- read_csv(here::here("data","caprecap","dens.pred.annual.csv"))%>%
   mutate(se=D.se)%>%
@@ -2232,15 +2237,9 @@ annotate("text", x = 2037,  y =60,
          hjust = 1)+
   guides(linetype = "none")
 
-abund.proj 
-```
-
-![](README_files/figure-gfm/DNA%20sim-1.png)<!-- -->
-
-``` r
 fig6 <- imi.map+(lambda.plot/abund.proj)+plot_layout(widths=c(1.5,1))
 ggsave(plot=fig6, here::here("plots/imi_plate.png"), width=12, height=11, bg="white")
 fig6
 ```
 
-![](README_files/figure-gfm/DNA%20sim-2.png)<!-- -->
+![](README_files/figure-gfm/DNA%20sim-1.png)<!-- -->
