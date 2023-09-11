@@ -1,0 +1,30 @@
+﻿Region,Sex,Ageclass,S,S.lcl,S.ucl,S.se,citation
+"Banff, AB",M,Subadult,0.73,0.53,0.94,,Garshelis et al. 2005 JWM
+"Banff, AB",F,Subadult,0.92,0.79,1,,Garshelis et al. 2005 JWM
+"Banff, AB",M,Adult,0.89,0.8,0.99,,Garshelis et al. 2005 JWM
+"Banff, AB",F,Adult,0.96,0.92,1,,Garshelis et al. 2005 JWM
+"Flathead, BC",F,Adult,0.93,0.89,0.97,,McLellan et al. 2015
+"Flathead, BC",F,Subadult,0.96,0.89,1,,McLellan et al. 2015
+Cabinet–Yaak/Selkirk,M,Subadult,0.765,0.589,0.942,,Wakkinen and Kasworm 2004
+Cabinet–Yaak/Selkirk,F,Subadult,0.9,0.7,1,,Wakkinen and Kasworm 2004
+Cabinet–Yaak/Selkirk,M,Adult,0.91,0.81,1,,Wakkinen and Kasworm 2004
+Cabinet–Yaak/Selkirk,F,Adult,0.94,0.87,1,,Wakkinen and Kasworm 2004
+"Parsnip Mtns, BC",F,Adult,0.96,0.92,1,,Ciarniello et al. 2009
+"Parsnip Plateau, BC",F,Adult,0.92,0.76,1,,Ciarniello et al. 2009
+"Parsnip Mtns, BC",M,Adult,1,1,1,,Ciarniello et al. 2009
+"Parsnip Plateau, BC",M,Adult,1,1,1,,Ciarniello et al. 2009
+"Parsnip Plateau, BC",M,Subadult,0.62,0.31,0.92,,Ciarniello et al. 2009
+"Parsnip Mtns, BC",M,Subadult,1,1,1,,Ciarniello et al. 2009
+"Parsnip Plateau, BC",F,Subadult,0.77,0.57,0.97,,Ciarniello et al. 2009
+"Denalia, AK",F,Adult,0.97,0.95,1,,Keay et al.  2018
+"Denalia, AK",M,Adult,0.98,0.95,1,,Keay et al.  2018
+"Denalia, AK",F,Subadult,1,1,1,,Keay et al.  2018
+"Denalia, AK",M,Subadult,0.94,0.86,1,,Keay et al.  2018
+"Barren-ground, NT",F,Adult,0.99,0.96,1,,McLoughlin et al. 2003
+"Barren-ground, NT",M,Adult,0.98,0.94,1,,McLoughlin et al. 2003
+"NCDE, MT",F,Subadult,0.884,0.7,0.96,,Mac e et al. 2011
+"NCDE, MT",F,Adult,0.93,0.87,0.96,,Mac e et al. 2011
+"Yellowstone, WY",F,Subadult,0.911,0.88,0.94,,Schwartz et al. 2006
+"Yellowstone, WY",F,Adult,0.98,0.97,0.98,,Schwartz et al. 2006
+"Yellowstone, WY",M,Subadult,0.95,0.93,0.97,,Schwartz et al. 2006
+"Yellowstone, WY",M,Adult,0.84,0.84,0.87,,Schwartz et al. 2006
