@@ -222,7 +222,7 @@ set.seed(6789);ggplot(cap, aes(x=age.combine, y=Weight, color=Sex%>%fct_relevel(
   geom_jitter(alpha=0.9,width=0.5)+
   scale_color_manual(values=RColorBrewer::brewer.pal(5, "Accent")[c(1,5)])+
   labs(x="Age", y="Weight (Kg)", color="Sex",
-       title="c) Weight by Age")+
+       title="(c) Weight by Age")+
   expand_limits(y=0)+
   theme_ipsum()+
   theme(axis.title.x = element_text(size=18),
@@ -245,7 +245,7 @@ fat.plot <- ggplot(cap%>%
   geom_point( aes(x=date2000, y=Fat, color=CapReason, shape=Sex), alpha=0.95,width=0.15, size=2)+
   scale_color_manual(values=RColorBrewer::brewer.pal(3, "Accent")[c(2:3)])+
   labs(x="Month", y="Fat (%)", color="Capture reason",shape="Sex",
-       title="d) % Fat by Month")+
+       title="(d) % Fat by Month")+
   expand_limits(y=0)+
   theme_ipsum()+
   theme(axis.title.x = element_text(size=18),
@@ -555,7 +555,7 @@ survival.plot <- ggplot()+
   geom_text(data=surv.yr.est%>%filter(ageclass!="0-1"),
             position = position_dodge(width = 0.5),hjust=1.5, aes(label=paste0("n=",n), y =est, x=sex, group=ageclass), size=5)+
   scale_fill_manual(values=RColorBrewer::brewer.pal(3, "Accent")[c(3:2)])+
-  labs(x="Sex", y="Annual survival", fill="Age class", title="a) Survival"
+  labs(x="Sex", y="Annual survival", fill="Age class", title="(a) Survival"
        #, subtitle = "by age class, with bootstrapped error distribution"
        )+
   theme_ipsum()+
@@ -845,7 +845,7 @@ repro.plot <- ggplot()+
   geom_text(data=repro.summary,
             hjust=1.5, aes(label=paste0("n=",n), y =est/2, x=mom.ageclass,  group=mom.ageclass), size=5)+
   scale_fill_manual(values=RColorBrewer::brewer.pal(3, "Accent")[c(2:3)])+
-  labs(x="Age class", y="Reproductive rate", fill="", title="b) Reproduction"
+  labs(x="Age class", y="Reproductive rate", fill="", title="(b) Reproduction"
        #, subtitle = "Female cubs per year by mother age class, with bootstrapped error distribution"
        )+
   theme_ipsum()+
@@ -1022,10 +1022,11 @@ lambda.plot <-ggplot()+
     geom_point(data=lambda.boot%>%summarise(est=median(l)%>%as.numeric),
                    aes(x =est,y=0))+
   geom_vline(xintercept = 1, linetype="dashed")+
-  labs(x="Population growth rate", y="Sample density", title="b) Intrinsic Population Growth Rate", subtitle = "without immigration")+
+  labs(x="Population growth rate", y="Sample density", title="(b) Intrinsic Population Growth Rate", subtitle = "without immigration")+
   annotate("text", x = 1.05, y = 0.95, label = "Increasing\npopulation",size=5) +
   annotate("text", x = 0.83, y = 0.95, label = "Decreasing\npopulation", size=5) +
   theme_ipsum()+
+  xlim(0.78,1.08)+
   theme(axis.title.x = element_text(size=18),
         axis.title.y = element_text(size=18),
         axis.text.x = element_text(size=17),
@@ -1404,7 +1405,7 @@ uncrecorded.plot <-ggplot(data=uncrecorded.plot.dat%>%mutate(Method=fct_relevel(
   scale_fill_manual(values=RColorBrewer::brewer.pal(4, "Dark2"))+
   scale_color_manual(values=RColorBrewer::brewer.pal(4, "Dark2"))+
   scale_y_continuous(breaks = NULL)+
-  labs(x="Unrecorded mortalities (%)", y="Sample density", title="d) Estimated Unrecorded Mortalities"
+  labs(x="Unrecorded mortalities (%)", y="Sample density", title="(d) Estimated Unrecorded Mortalities"
        #, subtitle = "5000 bootstrapped samples"
        )+
   theme_ipsum()+
@@ -1499,7 +1500,7 @@ compare.plot <- ggplot(surv.others, aes(x=S,y=Region.plot,xmin=S.lcl,xmax=S.ucl,
   geom_point(position = position_dodge(width = 0.4))+
   facet_wrap(vars(Ageclass))+
   labs(x="Survival", y="", 
-       title="c) Survival comparison"
+       title="(c) Survival comparison"
        #, subtitle="Elk Valley has lowest documented subadult survival in North America"
        )+
   expand_limits(y=0)+
@@ -1663,7 +1664,7 @@ cap.plot <- ggRGB(bmap.small, r=1, g=2, b=3)+
         legend.text = element_text(size=18),
         legend.title=element_text(size=19),
         legend.position = "bottom")+
-  labs(title="a) Captures",
+  labs(title="(a) Captures",
        fill="Capture reason")+
   scale_x_continuous(expand = c(0,0), limits = c(943588.1,1029124))+
   scale_y_continuous(expand = c(0,0), limits = c(-104054.3,50787.66))+
@@ -1687,7 +1688,7 @@ mort.plot <- ggRGB(bmap.small, r=1, g=2, b=3)+
         legend.position="bottom", 
         legend.box="vertical",
         legend.margin=margin())+
-  labs(title="b) Telemetry and Mortality",
+  labs(title="(b) Telemetry and Mortality",
        color="Cause",
        shape="Monitored at time?")+
   scale_x_continuous(expand = c(0,0), limits = c(943588.1,1029124))+
@@ -1735,7 +1736,7 @@ conf.seas <- tibble(month=1:12, lab=month.abb[month])%>%
   mutate(lab=fct_reorder(lab,month))%>%
   ggplot(aes(x=lab,y=n/(2021-2016)))+ ##scale by N years observed
   geom_col()+
-  labs(x="Month", y="Human-bear conflict reports", title="b) Seasonal conflict trend")+
+  labs(x="Month", y="Human-bear conflict reports", title="(b) Seasonal conflict trend")+
   theme_ipsum()+
   theme(axis.title.x = element_text(size=18),
         axis.title.y = element_text(size=18),
@@ -1764,7 +1765,7 @@ conf.ev <- ggRGB(bmap.small, r=1, g=2, b=3)+
         legend.position="bottom", 
         legend.box="vertical", 
         legend.margin=margin())+
-  labs(title="a) Human-bear conflicts")+
+  labs(title="(a) Human-bear conflicts")+
   scale_x_continuous(expand = c(0,0), limits = c(943588.1,1029124))+
   scale_y_continuous(expand = c(0,0), limits = c(-104054.3,35787.66))
 
@@ -1784,7 +1785,7 @@ conf.bc <- ggplot()+
         legend.position="bottom", 
         legend.box="vertical", 
         legend.margin=margin())+
-  labs(title="c) Provincial conflict hotspots",
+  labs(title="(c) Provincial conflict hotspots",
        fill="Conflicts per 10,000 sq.km/year")
 
 fig3 <- conf.ev+(conf.seas/conf.bc)
@@ -1895,7 +1896,7 @@ imi.map <- ggRGB(bmap.imi, r=1, g=2, b=3)+
         legend.margin = margin(0, 0, 0, 0),
         legend.box.margin = margin(0, 0, 0, 0),
         legend.position = "none")+
-  labs(title="a) Known immigrants into study area",
+  labs(title="(a) Known immigrants into study area",
        subtitle="3 male grizzly bears, 77-95 km displacements")+
   scale_y_continuous(expand = c(0,NA))+
   ggrepel::geom_label_repel(
@@ -1987,7 +1988,7 @@ abund.proj <- ggplot(secr.pred)+
   geom_line(aes(x=year, y=N, ymin=N-se, ymax=N+se, fill=method, linetype=type))+
   theme_ipsum()+
   labs(x="Year", y="N", fill="Method", linetype="Type",
-       title="c) Abundance", subtitle="Genetic capture recapture shows abundance is stable,\ncollars show population would decline without immigration")+
+       title="(c) Abundance", subtitle="Genetic capture recapture shows abundance is stable,\ncollars show population would decline without immigration")+
   expand_limits(y=0)+
   theme_ipsum()+
   theme(axis.title.x = element_text(size=18),
